@@ -127,6 +127,100 @@ app.get("/api/users/:email", async (req, res) => {
   }
 });
 
+// Define API endpoint for retrieving all users
+/**
+ * Retrieve all users.
+ * @name GET/api/users
+ * @function
+ * @memberof module:Server
+ * @inner
+ * @returns {Object} Response object containing array of user details.
+ */
+app.get("/api/users", async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json({ users });
+  } catch (error) {
+    console.error("Error retrieving users:", error);
+    res.status(500).json({ error: "Failed to retrieve users" });
+  }
+});
+
+// Define API endpoint for updating user details
+app.put("/api/users/:email", async (req, res) => {
+  const { email } = req.params;
+  const { contact, profession } = req.body;
+  try {
+    const user = await User.findOneAndUpdate(
+      { email },
+      { $set: { contact, profession } },
+      { new: true }
+    );
+    if (user) {
+      res.json({ message: "User details updated successfully" });
+    } else {
+      res.status(404).json({ error: "User not found" });
+    }
+  } catch (error) {
+    console.error("Error updating user details:", error);
+    res.status(500).json({ error: "Failed to update user details" });
+  }
+});
+
+// Define API endpoint for changing user password
+app.put("/api/user/:email/password", async (req, res) => {
+  const { email } = req.params;
+  const { newPassword } = req.body;
+  try {
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update user's password
+    user.password = hashedPassword;
+    await user.save();
+
+    res.json({ message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({ error: "Failed to change password" });
+  }
+});
+
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  auth: {
+    user: "mayadunneranali@gmail.com",
+    pass: "<password>",
+  },
+});
+
+app.post("/api/send-email", async (req, res) => {
+  const { subject, feedback } = req.body;
+
+  const mailOptions = {
+    from: "mayadunneranali@gmail.com",
+    to: "<receiver email>",
+    subject: `Feedback: ${subject}`,
+    text: feedback,
+  };
+
+  transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+      console.error(error);
+      res.status(500).send("Feedback submission unsuccessful! Try again!");
+    } else {
+      console.log("Email sent: " + info.response);
+      res.status(200).send("Thanks for sharing your feedback with us..");
+    }
+  });
+});
+
 /**
  *
  * Authenticate user login.
