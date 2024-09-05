@@ -17,7 +17,7 @@ app.use(express.json()); // Parsing incoming JSON requests
 // MongoDB connection
 mongoose
   .connect(
-    "mongodb+srv://mayadunneranali:JrCxhvvzBvFJhHoH@workwindb.qk6ps.mongodb.net/WorkWinDB?retryWrites=true&w=majority",
+    "mongodb+srv://mayadunneranali:<password>@workwindb.qk6ps.mongodb.net/WorkWinDB?retryWrites=true&w=majority",
     {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -205,7 +205,7 @@ app.post("/api/send-email", async (req, res) => {
 
   const mailOptions = {
     from: "mayadunneranali@gmail.com",
-    to: "<receiver email>",
+    to: "mayadunneranali@gmail.com",
     subject: `Feedback: ${subject}`,
     text: feedback,
   };
