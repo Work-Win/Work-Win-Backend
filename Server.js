@@ -221,6 +221,41 @@ app.post("/api/send-email", async (req, res) => {
   });
 });
 
+// Define the user activity route
+app.get("/api/user-activity", (req, res) => {
+  res.status(200).json({
+    userActivity: [
+      { date: "2024-08-10", count: 50 },
+      { date: "2024-08-11", count: 0 },
+      { date: "2024-08-12", count: 0 },
+      { date: "2024-08-13", count: 40 },
+      { date: "2024-08-14", count: 0 },
+      { date: "2024-08-15", count: 0 },
+      { date: "2024-08-16", count: 20 },
+      { date: "2024-08-17", count: 0 },
+      { date: "2024-08-18", count: 0 },
+      { date: "2024-08-19", count: 0 },
+      { date: "2024-08-20", count: 40 },
+      { date: "2024-08-21", count: 0 },
+      { date: "2024-08-22", count: 0 },
+      { date: "2024-08-23", count: 60 },
+      { date: "2024-08-24", count: 20 },
+      { date: "2024-08-25", count: 0 },
+      { date: "2024-08-26", count: 0 },
+      { date: "2024-08-27", count: 0 },
+      { date: "2024-08-28", count: 20 },
+      { date: "2024-08-29", count: 0 },
+      { date: "2024-08-30", count: 0 },
+      { date: "2024-08-31", count: 80 },
+      { date: "2024-09-01", count: 0 },
+      { date: "2024-09-02", count: 30 },
+      { date: "2024-09-03", count: 0 },
+      { date: "2024-09-04", count: 0 },
+      { date: "2024-09-05", count: 100 },
+    ],
+  });
+});
+
 /**
  *
  * Authenticate user login.
