@@ -252,6 +252,7 @@ app.get("/api/user-activity", (req, res) => {
       { date: "2024-09-03", count: 0 },
       { date: "2024-09-04", count: 0 },
       { date: "2024-09-05", count: 100 },
+      { date: "2024-09-06", count: 40 },
     ],
   });
 });
