@@ -40,8 +40,18 @@ const userSchema = new mongoose.Schema(
   { versionKey: false }
 ); // Set versionKey option to false to exclude __v field in the MongoDB cluster
 
+const activitySchema = new mongoose.Schema(
+  {
+    date: String,
+    count: Number,
+  },
+  { versionKey: false }
+);
+
 // Define User model
 const User = mongoose.model("users", userSchema);
+
+const Activity = mongoose.model("activity", activitySchema);
 
 // Define API endpoint for adding a new user
 /**
@@ -133,6 +143,43 @@ app.get("/api/users/:email", async (req, res) => {
   }
 });
 
+// Retrieve user activity for the heatmap
+app.get("/api/user-activity", async (req, res) => {
+  try {
+    const activities = await Activity.find(); // Retrieve all documents
+    if (activities.length > 0) {
+      res.json(activities); // Send the array of activities as response
+    } else {
+      res.status(404).json({ error: "No activities found" });
+    }
+  } catch (error) {
+    console.error("Error retrieving activities:", error);
+    res.status(500).json({ error: "Failed to retrieve activities" });
+  }
+});
+
+// Insert a new activity for the heatmap
+app.post("/api/update-heatmap", async (req, res) => {
+  try {
+    const currentDate = new Date().toISOString().split("T")[0];
+
+    const newActivity = new Activity({
+      date: currentDate,
+      count: 40,
+    });
+
+    await newActivity.save();
+
+    res.status(201).json({
+      message: "Activity created successfully",
+      activity: newActivity,
+    });
+  } catch (error) {
+    console.error("Error creating new activity:", error);
+    res.status(500).json({ error: "Failed to create activity" });
+  }
+});
+
 // Define API endpoint for retrieving all users
 /**
  * Retrieve all users.
@@ -160,6 +207,27 @@ app.put("/api/users/:email", async (req, res) => {
     const user = await User.findOneAndUpdate(
       { email },
       { $set: { contact, profession } },
+      { new: true }
+    );
+    if (user) {
+      res.json({ message: "User details updated successfully" });
+    } else {
+      res.status(404).json({ error: "User not found" });
+    }
+  } catch (error) {
+    console.error("Error updating user details:", error);
+    res.status(500).json({ error: "Failed to update user details" });
+  }
+});
+
+// Define API endpoint for updating highscore
+app.put("/api/highscore/:email", async (req, res) => {
+  const { email } = req.params;
+  const { highscore } = req.body;
+  try {
+    const user = await User.findOneAndUpdate(
+      { email },
+      { $set: { highscore } },
       { new: true }
     );
     if (user) {
@@ -224,42 +292,6 @@ app.post("/api/send-email", async (req, res) => {
       console.log("Email sent: " + info.response);
       res.status(200).send("Thanks for sharing your feedback with us..");
     }
-  });
-});
-
-// Define the user activity route
-app.get("/api/user-activity", (req, res) => {
-  res.status(200).json({
-    userActivity: [
-      { date: "2024-08-10", count: 50 },
-      { date: "2024-08-11", count: 0 },
-      { date: "2024-08-12", count: 0 },
-      { date: "2024-08-13", count: 40 },
-      { date: "2024-08-14", count: 0 },
-      { date: "2024-08-15", count: 0 },
-      { date: "2024-08-16", count: 20 },
-      { date: "2024-08-17", count: 0 },
-      { date: "2024-08-18", count: 0 },
-      { date: "2024-08-19", count: 0 },
-      { date: "2024-08-20", count: 40 },
-      { date: "2024-08-21", count: 0 },
-      { date: "2024-08-22", count: 0 },
-      { date: "2024-08-23", count: 60 },
-      { date: "2024-08-24", count: 20 },
-      { date: "2024-08-25", count: 0 },
-      { date: "2024-08-26", count: 0 },
-      { date: "2024-08-27", count: 0 },
-      { date: "2024-08-28", count: 20 },
-      { date: "2024-08-29", count: 0 },
-      { date: "2024-08-30", count: 0 },
-      { date: "2024-08-31", count: 80 },
-      { date: "2024-09-01", count: 0 },
-      { date: "2024-09-02", count: 30 },
-      { date: "2024-09-03", count: 0 },
-      { date: "2024-09-04", count: 0 },
-      { date: "2024-09-05", count: 100 },
-      { date: "2024-09-06", count: 40 },
-    ],
   });
 });
 
