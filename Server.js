@@ -48,10 +48,20 @@ const activitySchema = new mongoose.Schema(
   { versionKey: false }
 );
 
+const statusSchema = new mongoose.Schema(
+  {
+    title: String,
+    completed: Boolean,
+  },
+  { versionKey: false }
+);
+
 // Define User model
 const User = mongoose.model("users", userSchema);
 
 const Activity = mongoose.model("activity", activitySchema);
+
+const Status = mongoose.model("courses", statusSchema);
 
 // Define API endpoint for adding a new user
 /**
@@ -140,6 +150,41 @@ app.get("/api/users/:email", async (req, res) => {
   } catch (error) {
     console.error("Error retrieving user:", error);
     res.status(500).json({ error: "Failed to retrieve user" });
+  }
+});
+
+// Retrieve course status for all courses
+app.get("/api/course-status", async (req, res) => {
+  try {
+    const statuses = await Status.find(); // Retrieve all documents
+    if (statuses.length > 0) {
+      res.json(statuses); // Send the array of course statuses as response
+    } else {
+      res.status(404).json({ error: "No course statuses found" });
+    }
+  } catch (error) {
+    console.error("Error retrieving course status:", error);
+    res.status(500).json({ error: "Failed to retrieve course status" });
+  }
+});
+
+// Define API endpoint for updating course status
+app.put("/api/update-course-status", async (req, res) => {
+  const { title, completed } = req.body;
+  try {
+    const statuses = await Status.findOneAndUpdate(
+      { title },
+      { $set: { completed } },
+      { new: true }
+    );
+    if (statuses) {
+      res.json({ message: "Course status updated successfully" });
+    } else {
+      res.status(404).json({ error: "Course not found" });
+    }
+  } catch (error) {
+    console.error("Error updating course details:", error);
+    res.status(500).json({ error: "Failed to update course details" });
   }
 });
 
