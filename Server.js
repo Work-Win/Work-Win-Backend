@@ -34,6 +34,8 @@ const userSchema = new mongoose.Schema(
     password: String,
     profession: String,
     contact: String,
+    highscore: Number,
+    rank: Number,
   },
   { versionKey: false }
 ); // Set versionKey option to false to exclude __v field in the MongoDB cluster
@@ -112,11 +114,15 @@ app.get("/api/users/:email", async (req, res) => {
       const { username } = user;
       const { profession } = user;
       const { password } = user;
+      const { highscore } = user;
+      const { rank } = user;
       res.json({
         contact: contact,
         username: username,
         profession: profession,
         password: password,
+        highscore: highscore,
+        rank: rank,
       });
     } else {
       res.status(404).json({ error: "User not found" });
